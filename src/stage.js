@@ -37,20 +37,21 @@ export default class Stage {
   draw(ctx) {
     this.level.forEach((row, y) => {
       row.forEach((tile, x) => {
-        let xpos = x * this.tileSize;
-        let ypos = y * this.tileSize;
-        let cr = 'rgb('+
-            Math.floor(Math.random()*150)+','+
-            Math.floor(Math.random()*50)+','+
-            Math.floor(Math.random()*150)+')';
+        let xPos = x * this.tileSize;
+        let yPos = y * this.tileSize;
         if (tile === 1) {
             ctx.save();
             ctx.beginPath();
-            ctx.fillStyle = cr;
-            ctx.fillRect(xpos, ypos, this.tileSize, this.tileSize);
+            ctx.fillStyle = 'rgb(50, 0, 50)';
+            ctx.fillRect(xPos, yPos, this.tileSize, this.tileSize);
             ctx.stroke();
         }
+        
       });
     });
+  }
+
+  animate(ctx) {
+    this.draw(ctx)
   }
 }
