@@ -1,0 +1,16 @@
+{
+  "name": "mazer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "webpack-cli": "^3.3.12",
+    "webpack": "^4.44.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "webpack --watch --mode=development"
+  },
+  "author": "Kevin Ross",
+  "license": "ISC"
+}
