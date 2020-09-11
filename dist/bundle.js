@@ -103,105 +103,139 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Game {
-    constructor() {
-        let canvas = document.getElementById('mazer-canvas');
-        canvas.width = 1100;
-        canvas.height = 700;
-        this.ctx = canvas.getContext("2d");
-        this.registerEvents();
-        this.restart();
-    }
-
-    play() {
-        this.running = true;
-        this.animate();
-    }
+  constructor() {
+    let canvas = document.getElementById("mazer-canvas");
+    canvas.width = 1100;
+    canvas.height = 700;
+    this.startTime = 0;
+    this.gameOver = false;
+    this.ctx = canvas.getContext("2d");
     
-    restart() {
-        this.running = false;
-        this.stage = new _stage__WEBPACK_IMPORTED_MODULE_0__["default"]()
-        this.player = new _player__WEBPACK_IMPORTED_MODULE_1__["default"]()
-        this.animate();
+    this.registerEvents();
+    this.restart();
+  }
+
+  play() {
+    this.running = true;
+    this.startTime = Date.now();
+    this.animate();
+  }
+
+  restart() {
+    this.running = false;
+    this.stage = new _stage__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    this.player = new _player__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    this.animate();
+  }
+
+  registerEvents() {
+    this.boundClickHandler = this.click.bind(this);
+    window.addEventListener("mousedown", this.boundClickHandler);
+  }
+
+  click(e) {
+    if (!this.running) {    
+      this.play();
+      let winScreen = document.getElementsByClassName("win-modal")[0];
+      winScreen.classList.remove("is-open");
     }
+  }
 
-    registerEvents() {
-        this.boundClickHandler = this.click.bind(this);
-        this.ctx.canvas.addEventListener("mousedown", this.boundClickHandler);
+  checkWin() {
+    if (this.player.xPos > 1026 && this.player.yPos < 56) {
+      let winScreen = document.getElementsByClassName('win-modal')[0];
+      winScreen.classList.add("is-open");
+      this.running = false;
+      this.restart()
     }
+  }
 
-    click(e) {
-        if (!this.running) {
-            this.play();
-        }
+  animate() {
+    this.ctx.clearRect(0, 0, 1100, 700);
+    this.checkWin();
+    this.checkBottomCollision();
+    this.checkLeftCollision();
+    this.checkRightCollision();
+    this.checkTopCollision();
+    this.stage.animate(this.ctx);
+    this.player.animate(this.ctx);
+    console.log(
+    this.player.jumping
+    );
+    if (this.running) {
+      requestAnimationFrame(this.animate.bind(this));
     }
+  }
 
+  checkBottomCollision() {
+    let leftX = this.player.xPos;
+    let rightX = this.player.xPos + 15;
+    let bottomY = this.player.yPos + 15;
 
-    animate() {
-        this.ctx.clearRect(0, 0, 1100, 700);
-        this.checkBottomCollision();
-        this.checkLeftCollision();
-        this.checkRightCollision();
-        this.checkTopCollision();
-        this.stage.animate(this.ctx);
-        this.player.animate(this.ctx);
-        console.log(this.player.collision.top, this.player.collision.right, this.player.collision.bottom, this.player.collision.left);
-        if (this.running) {
-            requestAnimationFrame(this.animate.bind(this))
-        }
+    if (
+      this.stage.level[Math.floor(bottomY / 25)][Math.floor(rightX / 25)] === 1
+      ||
+      this.stage.level[Math.floor(bottomY / 25)][Math.floor(leftX / 25)] === 1
+    ) {
+      this.player.collision.bottom = true;
+      this.player.yPos = this.player.prevYPos;
+      this.onGround = true;
+    } else {
+      this.player.collision.bottom = false;
     }
+  }
 
-    checkBottomCollision() {
-        let leftX = this.player.xPos;
-        let rightX = this.player.xPos + 15; 
-        let bottomY = this.player.yPos + 15;
+  checkLeftCollision() {
+    let leftX = this.player.xPos - 3;
+    let topY = this.player.yPos;
+    let bottomY = this.player.yPos + 15;
 
-        if ((this.stage.level[Math.floor(bottomY / 25)][Math.floor(rightX / 25)] === 1) || (this.stage.level[Math.floor(bottomY / 25)][Math.floor(leftX / 25)] === 1)) {
-            this.player.yPos = this.player.prevYPos;
-            this.player.collision.bottom = true;
-            this.onGround = true;
-        } else {
-            this.player.collision.bottom = false;
-        }        
+    if (
+      this.stage.level[Math.floor(bottomY / 25)][Math.floor(leftX / 25)] === 1 
+      ||
+      this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1
+    ) {
+      this.player.collision.left = true;
+    //   this.player.xPos = this.player.prevXPos;
+    //   this.player.keys[37] = false
+    } else {
+      this.player.collision.left = false;
     }
+  }
 
-    checkLeftCollision() {
-        let leftX = this.player.xPos;
-        let topY = this.player.yPos;
-        let bottomY = this.player.yPos + 15;
+  checkRightCollision() {
+    let topY = this.player.yPos;
+    let rightX = this.player.xPos + 18;
+    let bottomY = this.player.yPos + 15;
 
-        if ((this.stage.level[Math.floor(bottomY / 25)][Math.floor(leftX / 25)] === 1) || (this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1)) {
-            this.player.xPos = this.player.prevXPos;
-            this.player.collision.left = true;
-        } else {
-            this.player.collision.left = false;
-        }
+    if (
+      this.stage.level[Math.floor(bottomY / 25)][Math.floor(rightX / 25)] === 1
+      ||
+      this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1
+    ) {
+      this.player.collision.right = true;
+    //   this.player.xPos = this.player.prevXPos;
+    //   this.player.keys[39] = false;
+    } else {
+      this.player.collision.right = false;
     }
+  }
 
-    checkRightCollision() {
-        let topY = this.player.yPos;
-        let rightX = this.player.xPos + 15; 
-        let bottomY = this.player.yPos + 15;
+  checkTopCollision() {
+    let leftX = this.player.xPos;
+    let topY = this.player.yPos - 3;
+    let rightX = this.player.xPos + 15;
 
-        if ((this.stage.level[Math.floor(bottomY / 25)][Math.floor(rightX / 25)] === 1) || (this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1)) {
-            this.player.xPos = this.player.prevXPos;
-            this.player.collision.right = true;
-        } else {
-            this.player.collision.right = false;
-        }
+    if (
+      this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1 
+      ||
+      this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1
+    ) {
+      this.player.collision.top = true;
+    } else {
+      this.player.collision.top = false;
     }
-
-    checkTopCollision() {
-        let leftX = this.player.xPos;
-        let topY = this.player.yPos;
-        let rightX = this.player.xPos + 15; 
-
-        if ((this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1) || (this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1)) {
-            this.player.yPos = this.player.prevYPos;
-            this.player.collision.top = true;
-        } else {
-            this.player.collision.top = false;
-        }
-    }
+  }
 }
 
 /***/ }),
@@ -235,18 +269,18 @@ new _game__WEBPACK_IMPORTED_MODULE_0__["default"]();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Player; });
-const CONSTANTS = {
-    GRAVITY: .25,
-    X_TERMINAL_VEL: 3,
-    Y_TERMINAL_VEL: 6.5,
-};
+
 
 class Player {
     constructor() {
+        this.gravity = .3;
+        this.xTermV = 3;
+        this.yTermV = 6.5;
+        this.level = 1;
         this.prevXPos = 0;
         this.prevYPos = 0
-        this.xPos = 562;
-        this.yPos = 30;
+        this.xPos = 43;
+        this.yPos = 643;
         this.width = 15;
         this.height = 15;
         this.speed = 2;
@@ -265,7 +299,7 @@ class Player {
 
     drawPlayer(ctx) {  
         ctx.beginPath()
-        ctx.fillStyle = 'rgb(0, 230, 0)';
+        ctx.fillStyle = 'rgb(0, 230, 230)';
         ctx.fillRect(this.xPos, this.yPos, this.width, this.height)
     }
 
@@ -279,84 +313,84 @@ class Player {
             this.keys[e.keyCode] = false;
         });
 
-        if (!this.collision.right) {
-            if (this.keys[39] && this.xVel < CONSTANTS.X_TERMINAL_VEL) {
-                this.xVel += 1;
-            } else {
-                if (this.xVel > 0) {
-                    this.xVel--;
-                }
-            }
-        } 
-        else if (!this.keys[37]) {
-            this.xVel = 0;
-        }
-        
-        if (!this.collision.left) {
-            if (this.keys[37] && Math.abs(this.xVel) < CONSTANTS.X_TERMINAL_VEL) {
-                this.xVel -= 1;
-            } else {
-                if (this.xVel < 0) {
-                    this.xVel ++;
-                }
-            }
-        } else if (!this.keys[39]) {
-            this.xVel = 0
-        }
-
-        if (!this.collision.top && this.onGround) {
-            if (this.keys[38] && Math.abs(this.yVel) < CONSTANTS.Y_TERMINAL_VEL && !this.jumping) {
-                this.jumping = true;
-                this.onGround = false;
-                this.yVel = -this.speed * 3.25
-            }  
-        }
-
-        if (this.collision.bottom) {
-          this.onGround = true;
-        } else {
-            this.onGround = false;
-        }
-
-        if (this.yVel > 0) {
-            this.jumping = false
-        }
-
-        if (this.xPos <= 25) {
-            this.xPos = 25;
-        } else if (this.xPos + 40 >= 1100) {
-            this.xPos = 1060;
-        }
-
-        if (this.yPos <= 25) {
-            this.yPos = 25;
-        } else if (this.yPos + 40 >= 700) {
-            this.yPos = 660;
-        }
-
-            
-
-        
-        
-        if (!this.onGround) {
-            this.yVel += CONSTANTS.GRAVITY;
-            if (Math.abs(this.yVel) > CONSTANTS.Y_TERMINAL_VEL) {
-                if (this.yVel > 0) {
-                    this.yVel = CONSTANTS.Y_TERMINAL_VEL
+        if (this.level === 1) {
+            if (!this.collision.right) {
+                if (this.keys[39] && this.xVel < this.xTermV) {
+                    this.xVel += 1;
                 } else {
-                    this.yVel = CONSTANTS.Y_TERMINAL_VEL * -1
+                    if (this.xVel > 0) {
+                        this.xVel--;
+                    }
                 }
+            } 
+            else if (!this.keys[37]) {
+                this.xVel = 0;
             }
-        } else {
-            this.yVel = 0
+            
+            if (!this.collision.left) {
+                if (this.keys[37] && Math.abs(this.xVel) < this.xTermV) {
+                    this.xVel -= 1;
+                } else {
+                    if (this.xVel < 0) {
+                        this.xVel ++;
+                    }
+                }
+            } else if (!this.keys[39]) {
+                this.xVel = 0
+            }
+            
+            if (!this.collision.top && this.onGround) {
+                if (this.keys[38]) {
+                    this.jumping = true;
+                    this.onGround = false;
+                    this.yVel = -this.speed * 3.5
+                }  
+            } else if (this.collision.top) {
+                this.yPos = this.prevYPos;
+                this.yVel = .5
+            }
+            
+            if (this.collision.bottom) {
+                this.onGround = true;
+            } else {
+                this.onGround = false;
+            }
+            
+            if (this.yVel >= 0) {
+                this.jumping = false
+            }
+            
+            if (this.xPos < 25) {
+                this.xPos = 25;
+            } else if (this.xPos > 1060) {
+                this.xPos = 1060;
+            }
+            
+            if (this.yPos < 25) {
+                this.yPos = 25;
+            } else if (this.yPos > 660) {
+                this.yPos = 660;
+            }
+            
+            if (!this.onGround) {
+                this.yVel += this.gravity;
+                if (Math.abs(this.yVel) >= this.yTermV) {
+                    if (this.yVel > 0) {
+                        this.yVel = this.yTermV
+                    }
+                }
+            } else {
+                this.yVel = 0
+            }
+            
+            this.prevXPos = this.xPos;
+            this.prevYPos = this.yPos;
+            this.xPos += this.xVel;
+            this.yPos += this.yVel;
         }
-
-        this.prevXPos = this.xPos;
-        this.prevYPos = this.yPos;
-        this.xPos += this.xVel;
-        this.yPos += this.yVel;
     }
-    
+        
+            
     animate(ctx) {
         this.movePlayer(ctx)
         this.drawPlayer(ctx);
@@ -375,13 +409,17 @@ class Player {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Stage; });
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./player */ "./src/player.js");
+
+
+
 class Stage {
   constructor() {
     this.tileSize = 25;
     this.level = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,2,2,1],
-        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,0,0,2,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,0,2,2,1],
         [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,1,1,1,0,0,1,1,1],
         [1,1,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,1,0,0,1,1],
         [1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,1,1,1,0,0,1,1,1,0,1,1,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1],
@@ -417,12 +455,12 @@ class Stage {
         let yPos = y * this.tileSize;
         if (tile === 1) {
           ctx.beginPath();
-          ctx.fillStyle = "rgb(50, 0, 50)";
+          ctx.fillStyle = "rgb(150, 0, 150)";
           ctx.fillRect(xPos, yPos, this.tileSize, this.tileSize);
           ctx.stroke();
         } else if (tile === 2) {
           ctx.beginPath();
-          ctx.fillStyle = "rgba(0, 200, 0, .5)";
+          ctx.fillStyle = "rgb(0, 200, 0)";
           ctx.fillRect(xPos, yPos, this.tileSize, this.tileSize);
           ctx.stroke();
         }
