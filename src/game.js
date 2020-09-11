@@ -21,7 +21,6 @@ export default class Game {
         this.running = false;
         this.stage = new Stage()
         this.player = new Player()
-
         this.animate();
     }
 
@@ -38,26 +37,69 @@ export default class Game {
 
 
     animate() {
-        this.ctx.clearRect(0, 0, 1100, 700)
+        this.ctx.clearRect(0, 0, 1100, 700);
+        this.checkBottomCollision();
+        this.checkLeftCollision();
+        this.checkRightCollision();
+        this.checkTopCollision();
         this.stage.animate(this.ctx);
         this.player.animate(this.ctx);
+        console.log(this.player.collision.top, this.player.collision.right, this.player.collision.bottom, this.player.collision.left);
         if (this.running) {
             requestAnimationFrame(this.animate.bind(this))
         }
     }
 
+    checkBottomCollision() {
+        let leftX = this.player.xPos;
+        let rightX = this.player.xPos + 15; 
+        let bottomY = this.player.yPos + 15;
+
+        if ((this.stage.level[Math.floor(bottomY / 25)][Math.floor(rightX / 25)] === 1) || (this.stage.level[Math.floor(bottomY / 25)][Math.floor(leftX / 25)] === 1)) {
+            this.player.yPos = this.player.prevYPos;
+            this.player.collision.bottom = true;
+            this.onGround = true;
+        } else {
+            this.player.collision.bottom = false;
+        }        
+    }
+
+    checkLeftCollision() {
+        let leftX = this.player.xPos;
+        let topY = this.player.yPos;
+        let bottomY = this.player.yPos + 15;
+
+        if ((this.stage.level[Math.floor(bottomY / 25)][Math.floor(leftX / 25)] === 1) || (this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1)) {
+            this.player.xPos = this.player.prevXPos;
+            this.player.collision.left = true;
+        } else {
+            this.player.collision.left = false;
+        }
+    }
+
+    checkRightCollision() {
+        let topY = this.player.yPos;
+        let rightX = this.player.xPos + 15; 
+        let bottomY = this.player.yPos + 15;
+
+        if ((this.stage.level[Math.floor(bottomY / 25)][Math.floor(rightX / 25)] === 1) || (this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1)) {
+            this.player.xPos = this.player.prevXPos;
+            this.player.collision.right = true;
+        } else {
+            this.player.collision.right = false;
+        }
+    }
+
+    checkTopCollision() {
+        let leftX = this.player.xPos;
+        let topY = this.player.yPos;
+        let rightX = this.player.xPos + 15; 
+
+        if ((this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1) || (this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1)) {
+            this.player.yPos = this.player.prevYPos;
+            this.player.collision.top = true;
+        } else {
+            this.player.collision.top = false;
+        }
+    }
 }
-
-// class App {
-//     constructor() {
-//         let canvas = document.createElement('canvas');
-//         let stage = new Stage()
-//         canvas.width = stage.tileSize * stage.level[0].length
-//         canvas.height = stage.tileSize * stage.level.length
-//         document.body.appendChild(canvas)
-//         let ctx = canvas.getContext("2d")
-//         stage.draw(ctx)
-//     }
-// }
-
-// new App();
