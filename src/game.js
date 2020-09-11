@@ -59,9 +59,6 @@ export default class Game {
     this.checkTopCollision();
     this.stage.animate(this.ctx);
     this.player.animate(this.ctx);
-    console.log(
-    this.player.jumping
-    );
     if (this.running) {
       requestAnimationFrame(this.animate.bind(this));
     }
