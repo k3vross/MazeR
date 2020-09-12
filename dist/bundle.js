@@ -101,7 +101,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 class Game {
   constructor() {
     let canvas = document.getElementById("mazer-canvas");
@@ -131,6 +130,10 @@ class Game {
   registerEvents() {
     this.boundClickHandler = this.click.bind(this);
     window.addEventListener("mousedown", this.boundClickHandler);
+    this.music = document.getElementById("music");
+    this.musicBtn = document.getElementById("music-btn");
+    this.musicEvent = this.handleMusic.bind(this);
+    this.musicBtn.addEventListener("click", this.musicEvent);
   }
 
   click(e) {
@@ -142,7 +145,7 @@ class Game {
   }
 
   checkWin() {
-    if (this.player.xPos > 1026 && this.player.yPos < 56) {
+    if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 1) {
       let winScreen = document.getElementsByClassName('win-modal')[0];
       winScreen.classList.add("is-open");
       this.running = false;
@@ -183,7 +186,7 @@ class Game {
   }
 
   checkLeftCollision() {
-    let leftX = this.player.xPos - 3;
+    let leftX = this.player.xPos - 4;
     let topY = this.player.yPos;
     let bottomY = this.player.yPos + 15;
 
@@ -202,7 +205,7 @@ class Game {
 
   checkRightCollision() {
     let topY = this.player.yPos;
-    let rightX = this.player.xPos + 18;
+    let rightX = this.player.xPos + 19;
     let bottomY = this.player.yPos + 15;
 
     if (
@@ -233,6 +236,19 @@ class Game {
       this.player.collision.top = false;
     }
   }
+
+  handleMusic(e) {
+        e.preventDefault()
+        if (this.musicBtn.classList.contains('fa-volume-mute')) {
+            this.music.play();
+            this.musicBtn.classList.remove('fa-volume-mute')
+            this.musicBtn.classList.add('fa-volume-up')
+        } else if (this.musicBtn.classList.contains('fa-volume-up')) {
+            this.music.pause();
+            this.musicBtn.classList.remove('fa-volume-up')
+            this.musicBtn.classList.add('fa-volume-mute')
+        }
+    }
 }
 
 /***/ }),
@@ -312,7 +328,7 @@ class Player {
 
         if (this.level === 1) {
             if (!this.collision.right) {
-                if (this.keys[39] && this.xVel < this.xTermV) {
+                if (this.keys[68] && this.xVel < this.xTermV) {
                     this.xVel += 1;
                 } else {
                     if (this.xVel > 0) {
@@ -320,24 +336,24 @@ class Player {
                     }
                 }
             } 
-            else if (!this.keys[37]) {
+            else if (!this.keys[65]) {
                 this.xVel = 0;
             }
             
             if (!this.collision.left) {
-                if (this.keys[37] && Math.abs(this.xVel) < this.xTermV) {
+                if (this.keys[65] && Math.abs(this.xVel) < this.xTermV) {
                     this.xVel -= 1;
                 } else {
                     if (this.xVel < 0) {
                         this.xVel ++;
                     }
                 }
-            } else if (!this.keys[39]) {
+            } else if (!this.keys[68]) {
                 this.xVel = 0
             }
             
             if (!this.collision.top && this.onGround) {
-                if (this.keys[38]) {
+                if (this.keys[87]) {
                     this.jumping = true;
                     this.onGround = false;
                     this.yVel = -this.speed * 3.5
@@ -430,7 +446,7 @@ class Stage {
         [1,1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,1],
         [1,1,1,1,1,1,0,1,0,1,0,0,0,0,1,0,1,1,0,0,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,0,0,0,1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,1,1,1,1],
-        [1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,0,1,0,1],
+        [1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,0,1,1,1,1,1,1,0,1,0,1],
         [1,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,1,0,1,0,0,1,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1],
         [1,0,0,0,1,1,1,1,1,1,0,0,1,0,1,1,1,1,1,0,1,1,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,0,1],
         [1,1,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,0,1,0,0,1,0,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,1,0,0,0,1],

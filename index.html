@@ -4,15 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/game.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <title>MazeR</title>
 </head>
 <body>
-    <div>
-        <canvas id="mazer-canvas"></canvas>
-        <div class='win-modal'>
-            <p>YOU WIN</p>
+    <div class='container'>
+        <div class='title-container'>
+            <h1 id='title'>MazeR</h1>
         </div>
+        <div class='middle-container'>
+            <div class ='scores'>
+                <p>High Scores</p>
+            </div>
+            <canvas id="mazer-canvas"></canvas>
+            <div class ='instructions'>
+                <p>Instructions</p>
+            </div>
+        </div>
+        <div class='win-modal'>
+            <p class='win'>YOU WIN</p>
+        </div>
+        <audio id='music'>
+            <source src='./music/hero_immortal.mp3'>
+        </audio>
+        <i id='music-btn' class='fas fa-volume-mute'></i>
     </div>
     <script src="./dist/bundle.js"></script>
 </body>

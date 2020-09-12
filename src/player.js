@@ -44,7 +44,7 @@ export default class Player {
 
         if (this.level === 1) {
             if (!this.collision.right) {
-                if (this.keys[39] && this.xVel < this.xTermV) {
+                if (this.keys[68] && this.xVel < this.xTermV) {
                     this.xVel += 1;
                 } else {
                     if (this.xVel > 0) {
@@ -52,24 +52,24 @@ export default class Player {
                     }
                 }
             } 
-            else if (!this.keys[37]) {
+            else if (!this.keys[65]) {
                 this.xVel = 0;
             }
             
             if (!this.collision.left) {
-                if (this.keys[37] && Math.abs(this.xVel) < this.xTermV) {
+                if (this.keys[65] && Math.abs(this.xVel) < this.xTermV) {
                     this.xVel -= 1;
                 } else {
                     if (this.xVel < 0) {
                         this.xVel ++;
                     }
                 }
-            } else if (!this.keys[39]) {
+            } else if (!this.keys[68]) {
                 this.xVel = 0
             }
             
             if (!this.collision.top && this.onGround) {
-                if (this.keys[38]) {
+                if (this.keys[87]) {
                     this.jumping = true;
                     this.onGround = false;
                     this.yVel = -this.speed * 3.5

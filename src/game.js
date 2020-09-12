@@ -1,7 +1,6 @@
 import Stage from "./stage";
 import Player from "./player";
 
-
 export default class Game {
   constructor() {
     let canvas = document.getElementById("mazer-canvas");
@@ -31,6 +30,10 @@ export default class Game {
   registerEvents() {
     this.boundClickHandler = this.click.bind(this);
     window.addEventListener("mousedown", this.boundClickHandler);
+    this.music = document.getElementById("music");
+    this.musicBtn = document.getElementById("music-btn");
+    this.musicEvent = this.handleMusic.bind(this);
+    this.musicBtn.addEventListener("click", this.musicEvent);
   }
 
   click(e) {
@@ -42,7 +45,7 @@ export default class Game {
   }
 
   checkWin() {
-    if (this.player.xPos > 1026 && this.player.yPos < 56) {
+    if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 1) {
       let winScreen = document.getElementsByClassName('win-modal')[0];
       winScreen.classList.add("is-open");
       this.running = false;
@@ -83,7 +86,7 @@ export default class Game {
   }
 
   checkLeftCollision() {
-    let leftX = this.player.xPos - 3;
+    let leftX = this.player.xPos - 4;
     let topY = this.player.yPos;
     let bottomY = this.player.yPos + 15;
 
@@ -102,7 +105,7 @@ export default class Game {
 
   checkRightCollision() {
     let topY = this.player.yPos;
-    let rightX = this.player.xPos + 18;
+    let rightX = this.player.xPos + 19;
     let bottomY = this.player.yPos + 15;
 
     if (
@@ -133,4 +136,17 @@ export default class Game {
       this.player.collision.top = false;
     }
   }
+
+  handleMusic(e) {
+        e.preventDefault()
+        if (this.musicBtn.classList.contains('fa-volume-mute')) {
+            this.music.play();
+            this.musicBtn.classList.remove('fa-volume-mute')
+            this.musicBtn.classList.add('fa-volume-up')
+        } else if (this.musicBtn.classList.contains('fa-volume-up')) {
+            this.music.pause();
+            this.musicBtn.classList.remove('fa-volume-up')
+            this.musicBtn.classList.add('fa-volume-mute')
+        }
+    }
 }

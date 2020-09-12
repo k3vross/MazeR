@@ -1,5 +1,13 @@
-#mazer-canvas {
-    background-color: black;
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.middle-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .win-modal {
@@ -8,27 +16,58 @@
     color: white;
     text-align: center;
     height: 200px;
-    width: 1100px;
+    width: 100%;
     position: absolute;
     top: 250px;
 }
 
 .is-open {
     display: block;
-    /* background-color: rgb(20, 176, 223);
-    color: white;
-    text-align: center;
-    height: 200px;
-    width: 1100px;
-    position: absolute;
-    top: 250px; */
 }
 
-p {
+.win {
     font-family: 'Press Start 2P';
     padding-top: 40px;
     font-size: 40px;
 }
 
+#title {
+    display: block;
+    color: rgb(150, 0, 150);
+    text-align: center;
+    font-family: 'Press Start 2P';
+    font-size: 40px;
+}
+
+body {
+    background-color: black;
+}
+
+.scores, .instructions {
+    font-family: 'Press Start 2P';
+    color: ivory;
+    font-size: 14px;
+}
+
+p {
+    font-family: 'Press Start 2P';
+    color: ivory;
+    font-size: 14px;
+}
+
+.scores {
+    padding-right: 90px;
+}
+
+.instructions {
+    padding-left: 90px;
+}
+
+.fa-volume-mute, .fa-volume-up {
+    margin-top: 20px;
+    font-family: 'Press Start 2P';
+    color: white;
+    font-size: 30px;
+}
 
 
