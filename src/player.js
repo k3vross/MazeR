@@ -2,7 +2,7 @@
 
 export default class Player {
     constructor() {
-        this.gravity = .3;
+        this.gravity = .25;
         this.xTermV = 3;
         this.yTermV = 6.5;
         this.level = 1;
@@ -42,32 +42,33 @@ export default class Player {
             this.keys[e.keyCode] = false;
         });
 
+        
+        if (!this.collision.right) {
+            if (this.keys[68] && this.xVel < this.xTermV) {
+                this.xVel += 1;
+            } else {
+                if (this.xVel > 0) {
+                    this.xVel--;
+                }
+            }
+        } 
+        else if (!this.keys[65]) {
+            this.xVel = 0;
+        }
+        
+        if (!this.collision.left) {
+            if (this.keys[65] && Math.abs(this.xVel) < this.xTermV) {
+                this.xVel -= 1;
+            } else {
+                if (this.xVel < 0) {
+                    this.xVel ++;
+                }
+            }
+        } else if (!this.keys[68]) {
+            this.xVel = 0
+        }
+        
         if (this.level === 1) {
-            if (!this.collision.right) {
-                if (this.keys[68] && this.xVel < this.xTermV) {
-                    this.xVel += 1;
-                } else {
-                    if (this.xVel > 0) {
-                        this.xVel--;
-                    }
-                }
-            } 
-            else if (!this.keys[65]) {
-                this.xVel = 0;
-            }
-            
-            if (!this.collision.left) {
-                if (this.keys[65] && Math.abs(this.xVel) < this.xTermV) {
-                    this.xVel -= 1;
-                } else {
-                    if (this.xVel < 0) {
-                        this.xVel ++;
-                    }
-                }
-            } else if (!this.keys[68]) {
-                this.xVel = 0
-            }
-            
             if (!this.collision.top && this.onGround) {
                 if (this.keys[87]) {
                     this.jumping = true;
@@ -78,7 +79,20 @@ export default class Player {
                 this.yPos = this.prevYPos;
                 this.yVel = .5
             }
-            
+        } else if (this.level === 2) {
+            if (!this.collision.bottom && this.onGround) {
+              if (this.keys[83]) {
+                this.jumping = true;
+                this.onGround = false;
+                this.yVel = this.speed * 4.8;
+              }
+            } else if (this.collision.bottom) {
+              this.yPos = this.prevYPos;
+              this.yVel = -0.5;
+            }
+        }
+    
+        if (this.level === 1) {
             if (this.collision.bottom) {
                 this.onGround = true;
             } else {
@@ -88,36 +102,52 @@ export default class Player {
             if (this.yVel >= 0) {
                 this.jumping = false
             }
-            
-            if (this.xPos < 25) {
-                this.xPos = 25;
-            } else if (this.xPos > 1060) {
-                this.xPos = 1060;
-            }
-            
-            if (this.yPos < 25) {
-                this.yPos = 25;
-            } else if (this.yPos > 660) {
-                this.yPos = 660;
-            }
-            
-            if (!this.onGround) {
-                this.yVel += this.gravity;
-                if (Math.abs(this.yVel) >= this.yTermV) {
-                    if (this.yVel > 0) {
-                        this.yVel = this.yTermV
-                    }
-                }
+        } else if (this.level === 2) {
+            this.gravity = - .25
+            if (this.collision.top) {
+              this.onGround = true;
             } else {
-                this.yVel = 0
+              this.onGround = false;
             }
-            
-            this.prevXPos = this.xPos;
-            this.prevYPos = this.yPos;
-            this.xPos += this.xVel;
-            this.yPos += this.yVel;
+
+            if (this.yVel <= 0) {
+              this.jumping = false;
+            }
         }
+        
+        if (this.xPos < 25) {
+            this.xPos = 25;
+        } else if (this.xPos > 1060) {
+            this.xPos = 1060;
+        }
+        
+        if (this.yPos < 25) {
+            this.yPos = 25;
+        } else if (this.yPos > 660) {
+            this.yPos = 660;
+        }
+        
+        if (!this.onGround) {
+            this.yVel += this.gravity;
+            if (Math.abs(this.yVel) >= this.yTermV) {
+                if (this.yVel > 0) {
+                    this.yVel = this.yTermV
+                }
+            }
+        } else {
+            this.yVel = 0
+        }
+
+        if (this.collision.top && this.collision.bottom && this.collision.right && this.collision.left) {
+            this.xPos = this.xPos - 16;
+        }
+        
+        this.prevXPos = this.xPos;
+        this.prevYPos = this.yPos;
+        this.xPos += this.xVel;
+        this.yPos += this.yVel;
     }
+    
         
             
     animate(ctx) {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/game.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <title>MazeR</title>
 </head>
@@ -15,12 +16,16 @@
         </div>
         <div class='middle-container'>
             <div class ='scores'>
-                <p>High Scores</p>
+                <p class='section-title'>High Scores</p>
             </div>
             <canvas id="mazer-canvas"></canvas>
             <div class ='instructions'>
-                <p>Instructions</p>
+                <p class='section-title'>Instructions</p>
+                <p>Use 'a', 'w', 'd', & 's' keys to move. Reach the green goal in the shortest time possible! Physics change in each level.</p>
             </div>
+        </div>
+        <div class='next-level'>
+            <p class='level-msg'>Feeling a little light?</p>
         </div>
         <div class='win-modal'>
             <p class='win'>YOU WIN</p>

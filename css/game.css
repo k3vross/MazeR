@@ -10,6 +10,17 @@
     justify-content: space-between;
 }
 
+.next-level {
+    display: none;
+    background-color: rgb(20, 176, 223);
+    color: white;
+    text-align: center;
+    height: 200px;
+    width: 100%;
+    position: absolute;
+    top: 250px;
+}
+
 .win-modal {
     display: none;
     background-color: rgb(20, 176, 223);
@@ -25,7 +36,7 @@
     display: block;
 }
 
-.win {
+.win, .level-msg {
     font-family: 'Press Start 2P';
     padding-top: 40px;
     font-size: 40px;
@@ -43,11 +54,27 @@ body {
     background-color: black;
 }
 
+.section-title {
+    color: rgb(0, 230, 230);
+    font-size: 18px;
+}
+
 .scores, .instructions {
     font-family: 'Press Start 2P';
     color: ivory;
     font-size: 14px;
+    text-align: center;
+    line-height: 25px;
 }
+
+.scores {
+    margin-left: 100px;
+}
+
+.instructions {
+    margin-right: 100px;
+}
+
 
 p {
     font-family: 'Press Start 2P';

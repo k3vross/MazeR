@@ -9,14 +9,22 @@ export default class Game {
     this.startTime = 0;
     this.gameOver = false;
     this.ctx = canvas.getContext("2d");
-    
     this.registerEvents();
     this.restart();
   }
 
+  timer() {
+    return (new Date().getTime() - this.startTime) / 1000
+  }
+
+  drawTimer() {
+    this.ctx.font = "35px VT323";
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText(this.timer().toFixed(2), 25, 22);
+  }
+
   play() {
     this.running = true;
-    this.startTime = Date.now();
     this.animate();
   }
 
@@ -37,31 +45,71 @@ export default class Game {
   }
 
   click(e) {
+    if (this.player.level === 1 && !this.running) {
+      this.startTime = Date.now()
+    }
     if (!this.running) {    
-      this.play();
+
       let winScreen = document.getElementsByClassName("win-modal")[0];
       winScreen.classList.remove("is-open");
+      this.play();    
     }
   }
 
-  checkWin() {
-    if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 1) {
-      let winScreen = document.getElementsByClassName('win-modal')[0];
-      winScreen.classList.add("is-open");
+  checkNextLevel() {
+    if (this.player.xPos > 1026 && this.player.yPos < 60) {
+      if (this.player.level === 1) {
+        this.ctx.font = "35px VT323";
+        this.ctx.fillStyle = "white";
+      } else if (this.player.level === 2) {
+        let winscreen = document.getElementsByClassName('win-modal')[0];
+        winscreen.classList.add('is-open');
+      }
       this.running = false;
-      this.restart()
+      if (this.player.level === 2) {
+        this.gameOver = true;
+        this.endGame()
+      }
+      if (this.player.level === 1) {
+        this.restart()
+        this.player.level = 2;
+      }
     }
   }
+
+  endGame() {
+
+  }
+
+  // checkWin() {
+  //   if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 3) {
+  //     let winScreen = document.getElementsByClassName('win-modal')[0];
+  //     winScreen.classList.add("is-open");
+  //     this.running = false;
+  //     this.restart()
+  //   }
+  // }
 
   animate() {
     this.ctx.clearRect(0, 0, 1100, 700);
-    this.checkWin();
+    this.checkNextLevel();
+    // this.checkWin();
     this.checkBottomCollision();
     this.checkLeftCollision();
     this.checkRightCollision();
     this.checkTopCollision();
     this.stage.animate(this.ctx);
     this.player.animate(this.ctx);
+    this.drawTimer();
+    if (this.player.level === 1) {
+      this.ctx.font = "35px VT323";
+      this.ctx.fillStyle = "white";
+      this.ctx.fillText("LEVEL 1: THIS SEEMS NORMAL", 713, 22);
+    } else {
+      this.ctx.font = "35px VT323";
+      this.ctx.fillStyle = "white";
+      this.ctx.fillText("LEVEL 2: WHAT GOES UP MUST...STAY UP?", 560, 22);
+    }
     if (this.running) {
       requestAnimationFrame(this.animate.bind(this));
     }
@@ -79,14 +127,16 @@ export default class Game {
     ) {
       this.player.collision.bottom = true;
       this.player.yPos = this.player.prevYPos;
-      this.onGround = true;
+      if (this.player.level === 1 ) {
+        this.onGround = true;
+      }
     } else {
       this.player.collision.bottom = false;
     }
   }
 
   checkLeftCollision() {
-    let leftX = this.player.xPos - 4;
+    let leftX = this.player.xPos - 2;
     let topY = this.player.yPos;
     let bottomY = this.player.yPos + 15;
 
@@ -96,8 +146,7 @@ export default class Game {
       this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1
     ) {
       this.player.collision.left = true;
-    //   this.player.xPos = this.player.prevXPos;
-    //   this.player.keys[37] = false
+      this.player.xPos = this.player.xPos + 1
     } else {
       this.player.collision.left = false;
     }
@@ -105,7 +154,7 @@ export default class Game {
 
   checkRightCollision() {
     let topY = this.player.yPos;
-    let rightX = this.player.xPos + 19;
+    let rightX = this.player.xPos + 17;
     let bottomY = this.player.yPos + 15;
 
     if (
@@ -114,8 +163,7 @@ export default class Game {
       this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1
     ) {
       this.player.collision.right = true;
-    //   this.player.xPos = this.player.prevXPos;
-    //   this.player.keys[39] = false;
+      this.player.xPos = this.player.xPos - 1;
     } else {
       this.player.collision.right = false;
     }
@@ -123,7 +171,7 @@ export default class Game {
 
   checkTopCollision() {
     let leftX = this.player.xPos;
-    let topY = this.player.yPos - 3;
+    let topY = this.player.yPos - 1;
     let rightX = this.player.xPos + 15;
 
     if (
@@ -132,6 +180,10 @@ export default class Game {
       this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1
     ) {
       this.player.collision.top = true;
+      this.player.yPos = this.player.yPos + 1;
+      if (this.player.level === 2) {
+        this.onGround = true;
+      }
     } else {
       this.player.collision.top = false;
     }

@@ -109,14 +109,22 @@ class Game {
     this.startTime = 0;
     this.gameOver = false;
     this.ctx = canvas.getContext("2d");
-    
     this.registerEvents();
     this.restart();
   }
 
+  timer() {
+    return (new Date().getTime() - this.startTime) / 1000
+  }
+
+  drawTimer() {
+    this.ctx.font = "35px VT323";
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText(this.timer().toFixed(2), 25, 22);
+  }
+
   play() {
     this.running = true;
-    this.startTime = Date.now();
     this.animate();
   }
 
@@ -137,31 +145,71 @@ class Game {
   }
 
   click(e) {
+    if (this.player.level === 1 && !this.running) {
+      this.startTime = Date.now()
+    }
     if (!this.running) {    
-      this.play();
+
       let winScreen = document.getElementsByClassName("win-modal")[0];
       winScreen.classList.remove("is-open");
+      this.play();    
     }
   }
 
-  checkWin() {
-    if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 1) {
-      let winScreen = document.getElementsByClassName('win-modal')[0];
-      winScreen.classList.add("is-open");
+  checkNextLevel() {
+    if (this.player.xPos > 1026 && this.player.yPos < 60) {
+      if (this.player.level === 1) {
+        this.ctx.font = "35px VT323";
+        this.ctx.fillStyle = "white";
+      } else if (this.player.level === 2) {
+        let winscreen = document.getElementsByClassName('win-modal')[0];
+        winscreen.classList.add('is-open');
+      }
       this.running = false;
-      this.restart()
+      if (this.player.level === 2) {
+        this.gameOver = true;
+        this.endGame()
+      }
+      if (this.player.level === 1) {
+        this.restart()
+        this.player.level = 2;
+      }
     }
   }
+
+  endGame() {
+
+  }
+
+  // checkWin() {
+  //   if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 3) {
+  //     let winScreen = document.getElementsByClassName('win-modal')[0];
+  //     winScreen.classList.add("is-open");
+  //     this.running = false;
+  //     this.restart()
+  //   }
+  // }
 
   animate() {
     this.ctx.clearRect(0, 0, 1100, 700);
-    this.checkWin();
+    this.checkNextLevel();
+    // this.checkWin();
     this.checkBottomCollision();
     this.checkLeftCollision();
     this.checkRightCollision();
     this.checkTopCollision();
     this.stage.animate(this.ctx);
     this.player.animate(this.ctx);
+    this.drawTimer();
+    if (this.player.level === 1) {
+      this.ctx.font = "35px VT323";
+      this.ctx.fillStyle = "white";
+      this.ctx.fillText("LEVEL 1: THIS SEEMS NORMAL", 713, 22);
+    } else {
+      this.ctx.font = "35px VT323";
+      this.ctx.fillStyle = "white";
+      this.ctx.fillText("LEVEL 2: WHAT GOES UP MUST...STAY UP?", 560, 22);
+    }
     if (this.running) {
       requestAnimationFrame(this.animate.bind(this));
     }
@@ -179,14 +227,16 @@ class Game {
     ) {
       this.player.collision.bottom = true;
       this.player.yPos = this.player.prevYPos;
-      this.onGround = true;
+      if (this.player.level === 1 ) {
+        this.onGround = true;
+      }
     } else {
       this.player.collision.bottom = false;
     }
   }
 
   checkLeftCollision() {
-    let leftX = this.player.xPos - 4;
+    let leftX = this.player.xPos - 2;
     let topY = this.player.yPos;
     let bottomY = this.player.yPos + 15;
 
@@ -196,8 +246,7 @@ class Game {
       this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1
     ) {
       this.player.collision.left = true;
-    //   this.player.xPos = this.player.prevXPos;
-    //   this.player.keys[37] = false
+      this.player.xPos = this.player.xPos + 1
     } else {
       this.player.collision.left = false;
     }
@@ -205,7 +254,7 @@ class Game {
 
   checkRightCollision() {
     let topY = this.player.yPos;
-    let rightX = this.player.xPos + 19;
+    let rightX = this.player.xPos + 17;
     let bottomY = this.player.yPos + 15;
 
     if (
@@ -214,8 +263,7 @@ class Game {
       this.stage.level[Math.floor(topY / 25)][Math.floor(rightX / 25)] === 1
     ) {
       this.player.collision.right = true;
-    //   this.player.xPos = this.player.prevXPos;
-    //   this.player.keys[39] = false;
+      this.player.xPos = this.player.xPos - 1;
     } else {
       this.player.collision.right = false;
     }
@@ -223,7 +271,7 @@ class Game {
 
   checkTopCollision() {
     let leftX = this.player.xPos;
-    let topY = this.player.yPos - 3;
+    let topY = this.player.yPos - 1;
     let rightX = this.player.xPos + 15;
 
     if (
@@ -232,6 +280,10 @@ class Game {
       this.stage.level[Math.floor(topY / 25)][Math.floor(leftX / 25)] === 1
     ) {
       this.player.collision.top = true;
+      this.player.yPos = this.player.yPos + 1;
+      if (this.player.level === 2) {
+        this.onGround = true;
+      }
     } else {
       this.player.collision.top = false;
     }
@@ -286,7 +338,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class Player {
     constructor() {
-        this.gravity = .3;
+        this.gravity = .25;
         this.xTermV = 3;
         this.yTermV = 6.5;
         this.level = 1;
@@ -326,32 +378,33 @@ class Player {
             this.keys[e.keyCode] = false;
         });
 
+        
+        if (!this.collision.right) {
+            if (this.keys[68] && this.xVel < this.xTermV) {
+                this.xVel += 1;
+            } else {
+                if (this.xVel > 0) {
+                    this.xVel--;
+                }
+            }
+        } 
+        else if (!this.keys[65]) {
+            this.xVel = 0;
+        }
+        
+        if (!this.collision.left) {
+            if (this.keys[65] && Math.abs(this.xVel) < this.xTermV) {
+                this.xVel -= 1;
+            } else {
+                if (this.xVel < 0) {
+                    this.xVel ++;
+                }
+            }
+        } else if (!this.keys[68]) {
+            this.xVel = 0
+        }
+        
         if (this.level === 1) {
-            if (!this.collision.right) {
-                if (this.keys[68] && this.xVel < this.xTermV) {
-                    this.xVel += 1;
-                } else {
-                    if (this.xVel > 0) {
-                        this.xVel--;
-                    }
-                }
-            } 
-            else if (!this.keys[65]) {
-                this.xVel = 0;
-            }
-            
-            if (!this.collision.left) {
-                if (this.keys[65] && Math.abs(this.xVel) < this.xTermV) {
-                    this.xVel -= 1;
-                } else {
-                    if (this.xVel < 0) {
-                        this.xVel ++;
-                    }
-                }
-            } else if (!this.keys[68]) {
-                this.xVel = 0
-            }
-            
             if (!this.collision.top && this.onGround) {
                 if (this.keys[87]) {
                     this.jumping = true;
@@ -362,7 +415,20 @@ class Player {
                 this.yPos = this.prevYPos;
                 this.yVel = .5
             }
-            
+        } else if (this.level === 2) {
+            if (!this.collision.bottom && this.onGround) {
+              if (this.keys[83]) {
+                this.jumping = true;
+                this.onGround = false;
+                this.yVel = this.speed * 4.8;
+              }
+            } else if (this.collision.bottom) {
+              this.yPos = this.prevYPos;
+              this.yVel = -0.5;
+            }
+        }
+    
+        if (this.level === 1) {
             if (this.collision.bottom) {
                 this.onGround = true;
             } else {
@@ -372,36 +438,52 @@ class Player {
             if (this.yVel >= 0) {
                 this.jumping = false
             }
-            
-            if (this.xPos < 25) {
-                this.xPos = 25;
-            } else if (this.xPos > 1060) {
-                this.xPos = 1060;
-            }
-            
-            if (this.yPos < 25) {
-                this.yPos = 25;
-            } else if (this.yPos > 660) {
-                this.yPos = 660;
-            }
-            
-            if (!this.onGround) {
-                this.yVel += this.gravity;
-                if (Math.abs(this.yVel) >= this.yTermV) {
-                    if (this.yVel > 0) {
-                        this.yVel = this.yTermV
-                    }
-                }
+        } else if (this.level === 2) {
+            this.gravity = - .25
+            if (this.collision.top) {
+              this.onGround = true;
             } else {
-                this.yVel = 0
+              this.onGround = false;
             }
-            
-            this.prevXPos = this.xPos;
-            this.prevYPos = this.yPos;
-            this.xPos += this.xVel;
-            this.yPos += this.yVel;
+
+            if (this.yVel <= 0) {
+              this.jumping = false;
+            }
         }
+        
+        if (this.xPos < 25) {
+            this.xPos = 25;
+        } else if (this.xPos > 1060) {
+            this.xPos = 1060;
+        }
+        
+        if (this.yPos < 25) {
+            this.yPos = 25;
+        } else if (this.yPos > 660) {
+            this.yPos = 660;
+        }
+        
+        if (!this.onGround) {
+            this.yVel += this.gravity;
+            if (Math.abs(this.yVel) >= this.yTermV) {
+                if (this.yVel > 0) {
+                    this.yVel = this.yTermV
+                }
+            }
+        } else {
+            this.yVel = 0
+        }
+
+        if (this.collision.top && this.collision.bottom && this.collision.right && this.collision.left) {
+            this.xPos = this.xPos - 16;
+        }
+        
+        this.prevXPos = this.xPos;
+        this.prevYPos = this.yPos;
+        this.xPos += this.xVel;
+        this.yPos += this.yVel;
     }
+    
         
             
     animate(ctx) {
@@ -431,29 +513,29 @@ class Stage {
     this.tileSize = 25;
     this.level = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,2,2,1],
+        [1,0,1,0,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,2,2,1],
         [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,0,2,2,1],
         [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,1,1,1,0,0,1,1,1],
         [1,1,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,1,0,0,1,1],
-        [1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,1,1,1,0,0,1,1,1,0,1,1,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1],
-        [1,0,0,1,0,0,1,1,1,1,1,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,1,0,0,0,0,0,0,1],
-        [1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,1,1,1,1,1,0,0,1],
-        [1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,1],
-        [1,0,0,1,1,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,1,1,0,1,0,0,1,1],
-        [1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,1],
-        [1,0,0,1,0,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,1,1,1,0,0,1],
-        [1,1,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,0,0,1],
+        [1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,0,1,0,0,1,1,1],
+        [1,0,0,0,0,0,1,1,1,1,1,0,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,1,0,0,0,0,1,1,0,1,0,0,0,0,0,0,1],
+        [1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,1,1,1,1,1,0,0,1],
+        [1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,1],
+        [1,0,0,1,1,0,0,0,1,0,1,0,0,1,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,1,1,0,1,0,0,1,1],
+        [1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,1],
+        [1,0,0,1,0,0,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,1,1,1,0,0,1],
+        [1,1,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,0,0,1],
         [1,1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,0,1,1],
-        [1,1,1,1,1,1,0,1,0,1,0,0,0,0,1,0,1,1,0,0,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,0,1,0,1,0,0,0,0,1,0,1,1,0,0,1,1,0,1,0,0,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,0,0,0,1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,1,1,1,1],
-        [1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,0,1,1,1,1,1,1,0,1,0,1],
+        [1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,0,1,0,1],
         [1,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,1,0,1,0,0,1,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1],
-        [1,0,0,0,1,1,1,1,1,1,0,0,1,0,1,1,1,1,1,0,1,1,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,0,1],
-        [1,1,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,0,1,0,0,1,0,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,1,0,0,0,1],
+        [1,0,0,0,1,1,1,1,1,1,0,0,1,0,1,1,1,1,1,1,0,1,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,0,1],
+        [1,1,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,0,1,0,0,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,1,0,0,0,1],
         [1,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,1,1,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,1,0,1],
-        [1,1,0,0,0,1,1,1,0,1,0,0,1,0,0,0,0,0,1,1,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,1,0,0,1,0,0,1,1,1,1,1,1,1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
-        [1,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1],
+        [1,1,0,0,0,1,1,1,0,1,0,0,1,0,0,0,0,0,1,0,1,1,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,1,0,0,1,0,0,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+        [1,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1],
         [1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1],
         [1,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,1],
@@ -467,15 +549,11 @@ class Stage {
         let xPos = x * this.tileSize;
         let yPos = y * this.tileSize;
         if (tile === 1) {
-          ctx.beginPath();
           ctx.fillStyle = "rgb(150, 0, 150)";
           ctx.fillRect(xPos, yPos, this.tileSize, this.tileSize);
-          ctx.stroke();
         } else if (tile === 2) {
-          ctx.beginPath();
           ctx.fillStyle = "rgb(0, 200, 0)";
           ctx.fillRect(xPos, yPos, this.tileSize, this.tileSize);
-          ctx.stroke();
         }
       });
     });
