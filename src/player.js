@@ -51,8 +51,7 @@ export default class Player {
                     this.xVel--;
                 }
             }
-        } 
-        else if (!this.keys[65]) {
+        } else if (!this.keys[65]) {
             this.xVel = 0;
         }
         
@@ -138,9 +137,22 @@ export default class Player {
             this.yVel = 0
         }
 
+
+
+        // wall glitch resolutions
         if (this.collision.top && this.collision.bottom && this.collision.right && this.collision.left) {
             this.xPos = this.xPos - 16;
         }
+
+        if (this.collision.top && this.collision.bottom && this.collision.right) {
+            this.xPos = this.xPos - 8
+        }
+
+        if (this.collision.top && this.collision.bottom && this.collision.left) {
+            this.xPos = this.xPos + 8
+        }
+
+        
         
         this.prevXPos = this.xPos;
         this.prevYPos = this.yPos;

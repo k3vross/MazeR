@@ -48,8 +48,9 @@ export default class Game {
     if (this.player.level === 1 && !this.running) {
       this.startTime = Date.now()
     }
-    if (!this.running) {    
-
+    if (!this.running && !this.gameOver) {    
+      let welcome = document.getElementsByClassName('welcome')[0];
+      welcome.classList.add('is-closed');
       let winScreen = document.getElementsByClassName("win-modal")[0];
       winScreen.classList.remove("is-open");
       this.play();    
@@ -62,23 +63,37 @@ export default class Game {
         this.ctx.font = "35px VT323";
         this.ctx.fillStyle = "white";
       } else if (this.player.level === 2) {
+        let finalTime = (new Date().getTime() - this.startTime) / 1000
         let winscreen = document.getElementsByClassName('win-modal')[0];
+        let score = document.createElement("P");
+        score.class = "score-msg";
+        let text = document.createTextNode(`Your final score is ${finalTime}`);
+        score.appendChild(text);
+        let playAgain = document.createElement("a");
+        playAgain.href = 'https://k3vross.github.io/MazeR';
+        let playText = document.createTextNode(`Play Again`);
+        playAgain.appendChild(playText);
+        winscreen.appendChild(score);
+        winscreen.appendChild(playAgain);
         winscreen.classList.add('is-open');
-      }
-      this.running = false;
-      if (this.player.level === 2) {
+        this.running = false;
         this.gameOver = true;
-        this.endGame()
+        
       }
       if (this.player.level === 1) {
-        this.restart()
+        this.player.xPos = 43;
+        this.player.yPos = 643
         this.player.level = 2;
       }
     }
   }
 
   endGame() {
-
+    // let finalTime = (new Date().getTime() - this.startTime) / 1000
+    
+    // let text = document.createTextNode(`Your final score is ${finalTime}`);
+    // score.appendChild(text);
+    // document.getElementByClassName("win-modal")[0].appendChild(score);  
   }
 
   // checkWin() {
@@ -100,18 +115,19 @@ export default class Game {
     this.checkTopCollision();
     this.stage.animate(this.ctx);
     this.player.animate(this.ctx);
-    this.drawTimer();
-    if (this.player.level === 1) {
-      this.ctx.font = "35px VT323";
-      this.ctx.fillStyle = "white";
-      this.ctx.fillText("LEVEL 1: THIS SEEMS NORMAL", 713, 22);
-    } else {
-      this.ctx.font = "35px VT323";
-      this.ctx.fillStyle = "white";
-      this.ctx.fillText("LEVEL 2: WHAT GOES UP MUST...STAY UP?", 560, 22);
-    }
+    console.log(this.player.collision.right, this.player.collision.bottom, this.player.collision.top)
     if (this.running) {
       requestAnimationFrame(this.animate.bind(this));
+      this.drawTimer();
+      if (this.player.level === 1) {
+        this.ctx.font = "35px VT323";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText("LEVEL 1: THIS SEEMS NORMAL", 713, 22);
+      } else {
+        this.ctx.font = "35px VT323";
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText("LEVEL 2: WHAT GOES UP MUST...STAY UP?", 560, 22);
+      }
     }
   }
 

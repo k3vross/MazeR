@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="./css/game.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
@@ -15,14 +19,22 @@
             <h1 id='title'>MazeR</h1>
         </div>
         <div class='middle-container'>
-            <div class ='scores'>
-                <p class='section-title'>High Scores</p>
+            <div class='instructions'>
+                <p class='section-title'>Instructions</p>
+                <p>Use 'a', 'w', 'd', & 's' keys to move. Reach the green goal in the shortest time possible. Physics change in the
+                    next level!</p>
             </div>
             <canvas id="mazer-canvas"></canvas>
-            <div class ='instructions'>
-                <p class='section-title'>Instructions</p>
-                <p>Use 'a', 'w', 'd', & 's' keys to move. Reach the green goal in the shortest time possible! Physics change in each level.</p>
+            <div class='scores'>
+                <p class='section-title'>Thanks for playing!</p>
+                <a href="https://github.com/k3vross" add target="_blank"><img src="./images/github.png" alt="github"></a>
+                <a href="https://www.linkedin.com/in/kevin-ross-7450591ab/" add target="_blank"><img src="./images/linkedIn.png" alt="LinkedIn"></a>
+
             </div>
+        </div>
+        <div class='welcome'>
+            <p class='welcome-msg'>Welcome to MazeR!</p>
+            <p class='welcome-msg'>Click anywhere to begin</p>
         </div>
         <div class='win-modal'>
             <p class='win'>YOU WIN</p>
