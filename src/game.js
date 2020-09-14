@@ -78,7 +78,6 @@ export default class Game {
         winscreen.classList.add('is-open');
         this.running = false;
         this.gameOver = true;
-        
       }
       if (this.player.level === 1) {
         this.player.xPos = 43;
@@ -88,34 +87,15 @@ export default class Game {
     }
   }
 
-  endGame() {
-    // let finalTime = (new Date().getTime() - this.startTime) / 1000
-    
-    // let text = document.createTextNode(`Your final score is ${finalTime}`);
-    // score.appendChild(text);
-    // document.getElementByClassName("win-modal")[0].appendChild(score);  
-  }
-
-  // checkWin() {
-  //   if (this.player.xPos > 1026 && this.player.yPos < 56 && this.player.level === 3) {
-  //     let winScreen = document.getElementsByClassName('win-modal')[0];
-  //     winScreen.classList.add("is-open");
-  //     this.running = false;
-  //     this.restart()
-  //   }
-  // }
-
   animate() {
     this.ctx.clearRect(0, 0, 1100, 700);
     this.checkNextLevel();
-    // this.checkWin();
     this.checkBottomCollision();
     this.checkLeftCollision();
     this.checkRightCollision();
     this.checkTopCollision();
     this.stage.animate(this.ctx);
     this.player.animate(this.ctx);
-    console.log(this.player.collision.right, this.player.collision.bottom, this.player.collision.top)
     if (this.running) {
       requestAnimationFrame(this.animate.bind(this));
       this.drawTimer();
