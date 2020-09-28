@@ -62,7 +62,7 @@ checkBottomCollision() {
   }
 ```
 
-* Getting the physics to change as the level changes required a level variable assigned to the player. Once the first level is completed, the varibale is changed. That variable is used to change the physics of the game
+* Getting the physics to change as the level changes required a level variable assigned to the player. Once the first level is completed, the variable is changed. That variable is used to change the physics of the game
 
 ```javascript
 if (this.level === 1) {
