@@ -99,26 +99,40 @@ a {
 }
 
 .instructions {
-    padding-right: 40px;
-    width: 200px;
-    margin-left: 100px;
+    text-align: center;
+ 
 }
 
 .fa-volume-mute, .fa-volume-up {
-    margin-top: 20px;
     font-family: 'Press Start 2P';
     color: white;
     font-size: 30px;
 }
 
-img  {
-    height: 100px;
-    width: 100px;
-    margin-top: 100px;
+.gh {
+    height: 50px;
+    width: 50px;
+    margin: 10px 100px 0 100px;
+}
+
+.li {
+     height: 45px;
+    width: 45px;
+    margin: 10px 100px 0 100px;
 }
 
 .credits {
     text-align: center;
+    margin: 0;
+}
+
+.footer {
+    display: flex;
+}
+
+.music {
+    display: flex;
+    flex-direction: column;
 }
 
 

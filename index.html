@@ -22,19 +22,10 @@
     <div class='container'>
         <div class='title-container'>
             <h1 id='title'>MazeR</h1>
+            <p class='instructions'>Use a, w, d, s keys to move. Reach the green goal in the shortest time possible.</p>
         </div>
         <div class='middle-container'>
-            <div class='instructions'>
-                <p class='section-title'>Instructions</p>
-                <p>Use 'a', 'w', 'd', & 's' keys to move. Reach the green goal in the shortest time possible. Physics change in the
-                    next level!</p>
-            </div>
             <canvas id="mazer-canvas"></canvas>
-            <div class='scores'>
-                <p class='section-title'>Thanks for playing!</p>
-                <a href="https://github.com/k3vross" add target="_blank"><img src="./images/github.png" alt="github"></a>
-                <a href="https://www.linkedin.com/in/kevin-ross-7450591ab/" add target="_blank"><img src="./images/linkedIn.png" alt="LinkedIn"></a>
-            </div>
         </div>
         <div class='welcome'>
             <p class='welcome-msg'>Welcome to MazeR!</p>
@@ -43,13 +34,23 @@
         <div class='win-modal'>
             <p class='win'>YOU WIN</p>
         </div>
-        <audio loop id='music'>
-            <source src='./music/hero_immortal.mp3'>
-        </audio>
-        <i id='music-btn' class='fas fa-volume-mute'></i>
-    </div>
-    <br>
-    <p class='credits'>Game music by Trevor Lentz</p>
-    <script src="./dist/bundle.js"></script>
+        <div class='footer'>
+            <div>
+                <a href="https://github.com/k3vross" add target="_blank"><img class='gh' src="./images/github.png" alt="github"></a>
+            </div>
+            <div class='music'>
+                <audio loop id='music'>
+                    <source src='./music/hero_immortal.mp3'>
+                </audio>
+                <i style='text-align: center;' id='music-btn' class='fas fa-volume-mute'></i>
+                <br>
+                <p class='credits'>Game music by Trevor Lentz</p>
+            </div>
+            <div>
+                <a href="https://www.linkedin.com/in/kevin-ross-7450591ab/" add target="_blank"><img class="li"src="./images/linkedIn.png"
+                    alt="LinkedIn"></a>
+            </div>
+        </div>
+        <script src="./dist/bundle.js"></script>
 </body>
 </html>
